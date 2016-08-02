@@ -1,0 +1,96 @@
+{
+    "steve": {
+        "am_home": true
+    },
+    "alarm": {
+        "is_on": true,
+        "hour": 8,
+        "minute": 45
+    },
+    "player": {
+        "volume": 5,
+        "commands": {
+            "volume_increase": "PLUS",
+            "power": "POWER",
+            "light": "LIGHTS",
+            "play": "PLAY",
+            "mode": "MODE",
+            "rewind": "REWIND",
+            "forward": "FORWARD",
+            "volume_decrease": "MINUS"
+        },
+        "is_on": false,
+        "light": 5,
+        "light_max": 5,
+        "light_min": 0,
+        "volume_min": 1,
+        "is_playing": false,
+        "volume_max": 16
+    },
+    "aircon": {
+        "commands": {
+            "cooling": "COOLING",
+            "off": "OFF",
+            "heating": "HEATING"
+        },
+        "heating_temperature_min": 18,
+        "cooling_temperature_min": 16,
+        "temperature": 26,
+        "cooling_temperature_max": 27,
+        "heating_temperature_max": 30,
+        "mode": "cooling",
+        "possible_modes": [
+            "heating",
+            "cooling"
+        ],
+        "is_on": false
+    },
+    "lights": {
+        "main_light": {
+            "commands": {
+                "full": "FULL",
+                "timer_off": "TIMER_OFF",
+                "intensity_increase": "INCREASE_BRIGHTNESS",
+                "smooth": "SMOOTH",
+                "intensity_decrease": "DECREASE_BRIGHTNESS",
+                "off": "OFF",
+                "red": "RED"
+            },
+            "is_on": false,
+            "intensity_max": 19,
+            "intensity_smooth": 0,
+            "intensity": 19,
+            "is_red": false,
+            "is_full": false,
+            "intensity_min": 0,
+            "is_smooth": false
+        },
+        "desk_light": {
+            "commands": {
+                "desk_off_binary": "111100000000",
+                "desk_on_raw": "768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 256 8704",
+                "desk_off_raw": "768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 8704",
+                "desk_on_binary": "111100001111"
+            },
+            "is_on": true
+        },
+        "shelf_light": {
+            "commands": {
+                "shelf_off_binary": "110000000000",
+                "shelf_on_raw": "768 256 768 256 768 256 768 256 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 256 8704",
+                "shelf_off_raw": "768 256 768 256 768 256 768 256 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 8704",
+                "shelf_on_binary": "110000001111"
+            },
+            "is_on": false
+        },
+        "door_light": {
+            "commands": {
+                "door_on_raw": "256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 256 8704",
+                "door_off_raw": "256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 768 256 8704",
+                "door_on_binary": "000000001111",
+                "door_off_binary": "000000000000"
+            },
+            "is_on": false
+        }
+    }
+}

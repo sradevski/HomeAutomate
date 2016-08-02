@@ -1,0 +1,16 @@
+{
+  "name": "homeautomateserver",
+  "version": "1.0.0",
+  "description": "HomeAutomate Server",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Stevche Radevski",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "python-shell": "^0.4.0"
+  }
+}
