@@ -23,7 +23,7 @@ class HomeAutomate extends Component {
 
 				<View style={[styles.section, {flex: 2, flexDirection: 'row', backgroundColor: 'steelblue', alignSelf: 'stretch', alignItems: 'center', justifyContent:'space-between'}]}>
           	<Text style={{alignSelf: 'center', color: 'beige', fontSize: 26}}> Steve's Home </Text>
-						<Button containerStyle = {{padding:4, margin: 3, width: 30, height: 30, overflow:'hidden', borderRadius:3, backgroundColor: 'steelblue', justifyContent: 'center'}} onPress= {() => this.reflectChangeToComponents()}>
+						<Button containerStyle = {{padding:4, margin: 3, width: 60, height: 30, overflow:'hidden', borderRadius:3, backgroundColor: 'steelblue', justifyContent: 'center'}} onPress= {() => this.reflectChangeToComponents()}>
 							<Icon name='md-refresh' color = 'beige' style={{textAlign: 'center'}} size={30}></Icon>
 						</Button>
         </View>

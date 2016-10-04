@@ -10,7 +10,7 @@ export default class HotkeyButton extends Component {
       <Button containerStyle ={[styles.hotkeyContainer, {backgroundColor: this.props.backgroundColor}]} onPress= {this.props.onPress} onLongPress = {this.props.onLongPress}>
         <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
         <Icon name={this.props.iconName} color = 'white' size={64}></Icon>
-        <Text style={{fontSize: 24, textAlign: 'center', color: 'white', marginTop:/ 8}}>{this.props.children}</Text>
+        <Text style={{fontSize: 24, textAlign: 'center', color: 'white', marginTop:8}}>{this.props.children}</Text>
         </View>
       </Button>
     );

@@ -1,0 +1,34 @@
+import json
+import subprocess
+from time import sleep
+
+PATH = "/home/pi/scripts/config.json"
+RADIO_EXECUTOR_COMMAND = "sudo /home/pi/scripts/codesend "
+
+def execute_IR_command(command, object_name):
+	full_command = "irsend SEND_ONCE " + object_name + " " + command
+	run_bash_command(full_command)
+	sleep(1)	
+
+def execute_RF_command(command):
+	full_command = RADIO_EXECUTOR_COMMAND + command
+	run_bash_command(full_command)
+
+def run_bash_command(command):
+	subprocess.call(command, shell=True)
+
+def config_set_fields_values(config, fieldsList, valuesList):
+	for i in range(0, len(fieldsList)):
+		config[fieldsList[i]] = valuesList[i]
+
+def load_config():
+	f = open(PATH, 'r')
+	config = json.loads(f.read())
+	
+	f.close()
+	return config
+
+def write_config(config):
+	f = open(PATH, "w+")
+	f.write(json.dumps(config))
+	f.close()

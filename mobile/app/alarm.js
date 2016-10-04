@@ -24,25 +24,16 @@ export default class Alarm extends Component {
 		isOn: false,
 		timeData: {
 			hour: '8',
-			minute: '0',
-			mode: 'AM'
+			minute: '15'
 		}
 	};
 
 	updateState(newState) {
-		let mode = 'AM',
-			hour = parseInt(newState.hour);
-		if (hour > 12) {
-			mode = 'PM'
-			hour = hour - 12;
-		}
-
 		this.setState({
 			isOn: newState.is_on,
 			timeData: {
-				hour: hour.toString(),
+				hour: newState.hour.toString(),
 				minute: newState.minute.toString(),
-				mode: mode,
 			}
 		});
 	}
@@ -72,7 +63,7 @@ export default class Alarm extends Component {
 
 		let args = ['r'];
 		if (nextState) {
-			args = [this._calculateHourFromMode(this.state.timeData.hour, this.state.timeData.mode), this.state.timeData.minute];
+			args = [this.state.timeData.hour, this.state.timeData.minute];
 		}
 
 		requestOptions['body'] = JSON.stringify([{
@@ -92,20 +83,11 @@ export default class Alarm extends Component {
 		if (this.state.isOn) {
 			requestOptions['body'] = JSON.stringify([{
 				name: 'alarmToggle',
-				args: [this._calculateHourFromMode(newTimeData.hour, newTimeData.mode), newTimeData.minute]
+				args: [newTimeData.hour, newTimeData.minute]
 			}]);
 
 			this.makeServerCall(requestOptions);
 		}
-	}
-
-	_calculateHourFromMode(hour, mode){
-		let newHour = parseInt(hour);
-		if (mode === 'PM') {
-			newHour += 12;
-		}
-
-		return newHour;
 	}
 
 	render() {
@@ -113,7 +95,7 @@ export default class Alarm extends Component {
 
 		return (
 			<View {...this.props}>
-        <ClickableLabel containerStyle = {{}} iconName= 'md-alarm' iconSize= {32} color = {labelColor} backgroundColor = 'skyblue' onPress = {() => this.alarmToggle()}>
+        <ClickableLabel containerStyle = {{paddingRight: 30}} iconName= 'md-alarm' iconSize= {32} color = {labelColor} backgroundColor = 'skyblue' onPress = {() => this.alarmToggle()}>
           Alarm
         </ClickableLabel>
 
@@ -130,9 +112,8 @@ export default class Alarm extends Component {
 }
 
 const alarmData = {
-	hour: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+	hour: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '0'],
 	minute: ['0', '5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'],
-	mode: ['AM', 'PM'],
 }
 
 const pickerColor = Platform.OS === 'android' ? { color: 'white' } : {},
@@ -140,6 +121,6 @@ const pickerColor = Platform.OS === 'android' ? { color: 'white' } : {},
 
 const styles = StyleSheet.create({
 	picker: {
-		width: 100
+		width: 90
 	},
 });
