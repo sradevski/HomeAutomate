@@ -1,32 +1,80 @@
 import React, { Component } from 'react';
-import {AppRegistry, StyleSheet, Text, View} from 'react-native';
+import {AppRegistry, StyleSheet, Text, View, ActivityIndicator} from 'react-native';
+import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
+import StatusBarAlert from 'react-native-statusbar-alert';
+
 import Button from 'react-native-button';
 import Player from './components/player';
 import Aircon from './components/aircon';
 import Lights from './components/lights';
 import Alarm from './components/alarm';
 import Hotkeys from './components/hotkeys';
+import NavBar from './components/navbar';
 
-export default class HomeAutomate extends Component {
-	state = {
-		rerenderComponents: true
-	};
+import {updateAlarmState} from './state/actions/alarm';
+import {updateLightsState} from './state/actions/lights';
+import {updatePlayerState} from './state/actions/player';
+import {updateAirconState} from './state/actions/aircon';
+import {addNotification, removeNotification} from './state/actions/notifications';
+
+import {generateNotificationFunction} from './shared/utils';
+
+const mapStateToProps = (state) => ({
+	notifications: state.notifications,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+	updateAlarmState: (newState) => {
+		dispatch(updateAlarmState(newState));
+	},
+	updateLightsState: (newState) => {
+		dispatch(updateLightsState(newState));
+	},
+	updatePlayerState: (newState) => {
+		dispatch(updatePlayerState(newState));
+	},
+	updateAirconState: (newState) => {
+		dispatch(updateAirconState(newState));
+	},
+	addNotification: (message, id) => {
+		dispatch(addNotification(message, id));
+	},
+	removeNotification: (id) => {
+		dispatch(removeNotification(id));
+	}
+});
+
+class HomeAutomate extends Component {
+	constructor(props){
+		super(props);
+
+		this.state = {
+			rerenderComponents: true,
+			isLoading: false,
+		};
+	}
+
+	componentWillMount(){
+		generateNotificationFunction(this.props.addNotification, this.props.removeNotification);
+	}
 
 	reflectChangeToComponents(){
 		this.setState({rerenderComponents: !this.state.rerenderComponents});
 	}
 
+	refreshState(){
+		this.setState({isLoading: true});
+		this.reflectChangeToComponents();
+		this.setState({isLoading: false});
+	}
+
 	render() {
+			const {notifications} = this.props;
 			return (
 			<View style={styles.container}>
-
-				<View style={[styles.section, {flex: 2, flexDirection: 'row', backgroundColor: 'steelblue', alignSelf: 'stretch', alignItems: 'center', justifyContent: 'space-between'}]}>
-						<Text style={{alignSelf: 'center', color: 'beige', fontSize: 26}}> Steve's Home </Text>
-						<Button containerStyle = {{padding: 4, margin: 3, width: 60, height: 30, overflow: 'hidden', borderRadius: 3, backgroundColor: 'steelblue', justifyContent: 'center'}} onPress= {() => this.reflectChangeToComponents()}>
-							<Icon name='md-refresh' color = 'beige' style={{textAlign: 'center'}} size={30}></Icon>
-						</Button>
-				</View>
+				<StatusBarAlert visible={notifications.length > 0} message={notifications[0] && (notifications[0].message || ' ')} backgroundColor='#3CC29E' color='white'/>
+				<NavBar refreshClickHandler = {() => this.refreshState()} isLoading = {this.state.isLoading}/>
 
 				<Hotkeys reflectChangeToComponents = {() => this.reflectChangeToComponents()} style={[styles.section, {flex: 6, flexDirection: 'row', backgroundColor: 'white', zIndex: 100}]}></Hotkeys>
 
@@ -54,3 +102,5 @@ const styles = StyleSheet.create({
 		borderColor: 'gray',
 	},
 });
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeAutomate);

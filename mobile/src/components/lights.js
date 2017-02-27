@@ -1,188 +1,109 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
+import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Button from 'react-native-button';
+import _ from 'lodash';
+
 import ClickableLabel from './sectionClickableLabel';
+import {makeServerCall, generateRequestBody, showNotification} from '../shared/utils';
+import {toggleLight, updateLightsState} from '../state/actions/lights';
 
-const serverUrl = 'http://192.168.11.101:8080/lights';
-//const serverUrl = 'http://10.0.2.2:8080/lights';
+const mapStateToProps = (state) => ({
+	lights: state.lights,
+});
 
-let requestOptions = {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-};
+const mapDispatchToProps = (dispatch) => ({
+	toggleLight: (lightId) => {
+		dispatch(toggleLight(lightId));
+	},
+	updateLightsState: (newState) => {
+		dispatch(updateLightsState(newState));
+	}
+});
 
-export default class Lights extends Component {
+class Lights extends Component {
+	componentDidMount(){
+		this.sendToServer(generateRequestBody('getConfig', []));
+	}
 
-  state = {
-    lights: {
-      'EN': false,
-      'DK':false,
-      'SF':false,
-      'MN':false
-    }
-  };
+	sendToServer(requestBody){
+		makeServerCall('lights', requestBody)
+		.then((data) => this.props.updateLightsState(data))
+		.catch((err) => showNotification(err));
+	}
 
-  componentWillMount(){
-    requestOptions['body'] = JSON.stringify([
-      {
-        name: 'getConfig',
-        args: []
-      }
-    ]);
+	toggleAllLights(shouldSetAllOn = false){
+		const nextLightsState = Object.assign({}, this.props.lights);
+		const shouldTurnOn = shouldSetAllOn || !this.isAnyOn();
 
-    this.makeServerCall(requestOptions);
-  }
+		_.keys(nextLightsState).forEach((key) => {
+			nextLightsState[key] = shouldTurnOn;
+		});
 
-  componentWillReceiveProps(newProps){
-    this.componentWillMount();
-  }
+		this.updateLightsState(nextLightsState);
+		this.sendToServer(generateRequestBody('toggleAllLights', shouldTurnOn ? ['an'] : ['af']));
+	}
 
-  updateState(newState){
-    this.setState({
-      lights: {
-        'EN': newState.door_light.is_on,
-        'DK': newState.desk_light.is_on,
-        'SF': newState.shelf_light.is_on,
-        'MN': newState.main_light.is_on,
-      }
-    });
-  }
+	toggleSingleLight(lightToModify){
+		const lightNextState = !this.props.lights[lightToModify];
+		const lightId = lightIdMap[lightToModify];
+		const lightToggle = lightNextState ? 'n' : 'f';
 
-  makeServerCall(requestOptions){
-    fetch(serverUrl, requestOptions)
-      .then(response => response.json())
-      .then((data) => this.updateState(data));
-  }
+		this.props.toggleLight(lightToModify);
+		//TODO: Rename toggleAllLights to toggleLight on server first, then here.
+		this.sendToServer(generateRequestBody('toggleAllLights', [lightId + lightToggle]));
+	}
 
-  toggleYellowLights(){
-    const goalState = !this._isAnyOn(true);
-    let newLightsState = Object.assign({}, this.state.lights);
+	isAnyOn(){
+		for (const isOn of _.values(this.props.lights)){
+			if (isOn){
+				return true;
+			}
+		}
+		return false;
+	}
 
-    Object.keys(this.state.lights).forEach( light => {
-      if(light !== 'MN'){
-        newLightsState[light] = goalState;
-      }
-    });
+	render(){
+		const {lights} = this.props;
 
-    this.setState({lights: newLightsState});
+		return (
+			<View {...this.props}>
+				<ClickableLabel containerStyle={{flex: 6, justifyContent: 'center'}} iconName= 'md-bulb'
+					iconSize= {32} color = '#66473b' backgroundColor = 'palegoldenrod' onPress = {() => this.toggleAllLights()} onLongPress={() => this.toggleAllLights(true)}>
+					Lights
+				</ClickableLabel>
 
-    let args = goalState ? ['rn'] : ['rf'];
-    requestOptions['body'] = JSON.stringify([
-      {
-        name: 'toggleYellowLights',
-        args: args
-      }
-    ]);
-
-    this.makeServerCall(requestOptions);
-  }
-
-  toggleAllLights(){
-    const goalState = !this._isAnyOn(false);
-    let newLightsState = {};
-
-    Object.keys(this.state.lights).forEach( light => {
-      newLightsState[light] = goalState;
-    });
-
-    this.setState({lights: newLightsState});
-
-    let args = goalState ? ['an'] : ['af'];
-    requestOptions['body'] = JSON.stringify([
-      {
-        name: 'toggleAllLights',
-        args: args
-      }
-    ]);
-
-    this.makeServerCall(requestOptions);
-  }
-
-  toggleSingleLight(lightToModify){
-    let newLightsState = Object.assign({}, this.state.lights);
-    let currentLightNextState = !this.state.lights[lightToModify];
-    newLightsState[lightToModify] = currentLightNextState;
-
-    this.setState({lights: newLightsState});
-
-    let lightId = this._getLightId(lightToModify);
-    let lightToggle = currentLightNextState ? 'n' : 'f';
-
-    requestOptions['body'] = JSON.stringify([
-      {
-        name: 'toggleAllLights',
-        args: [lightId + lightToggle]
-      }
-    ]);
-
-    this.makeServerCall(requestOptions);
-  }
-
-  _getLightId(light){
-    switch(light){
-      case 'EN':
-        return '1';
-      case 'DK':
-        return '2';
-      case 'SF':
-        return '3';
-      case 'MN':
-        return '4';
-    }
-  }
-
-  _isAnyOn(ignoreWhiteLight){
-    const lightKeys = Object.keys(this.state.lights);
-
-    for(let i = 0; i < lightKeys.length; i += 1){
-      if(this.state.lights[lightKeys[i]]){
-        if(!(ignoreWhiteLight && lightKeys[i] === 'MN')){
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  render(){
-    return (
-      <View {...this.props}>
-        <ClickableLabel containerStyle={{flex:6, justifyContent: 'center'}} iconName= 'md-bulb'
-          iconSize= {32} color = '#66473b' backgroundColor = 'palegoldenrod' onPress = {() => this.toggleYellowLights()} onLongPress={() => this.toggleAllLights()}>
-          Lights
-        </ClickableLabel>
-
-        <View style={{flex:6, flexDirection: 'row', alignItems: 'center'}}>
-          {Object.keys(this.state.lights).map((val, index) =>
-          <Button key ={val} containerStyle ={[styles.lightButtonContainer, { backgroundColor: this.state.lights[val] ? 'lightgreen' : 'red'}]} style={styles.lightButtonText} onPress={() => this.toggleSingleLight(val)}>
-            {val}
-          </Button>
-          )}
-        </View>
-      </View>
-    )
-  }
+				<View style={{flex: 6, flexDirection: 'row', alignItems: 'center'}}>
+					{_.keys(lights).map((val, index) =>
+					<Button key ={val} containerStyle ={[styles.lightButtonContainer, { backgroundColor: lights[val] ? 'lightgreen' : 'red'}]} style={styles.lightButtonText} onPress={() => this.toggleSingleLight(val)}>
+						{val}
+					</Button>
+					)}
+				</View>
+			</View>
+		);
+	}
 }
 
-const monospaceFontFamily = Platform.OS === 'android' ? 'monospace': 'Courier New'
+const lightIdMap = {'EN': '1', 'DK': '2', 'SF': 3};
+const monospaceFontFamily = Platform.OS === 'android' ? 'monospace': 'Courier New';
 
 const styles = StyleSheet.create({
-  lightButtonContainer:{
-    padding:4,
-    margin: 5,
-    width: 30,
-    height: 30,
-    overflow:'hidden',
-    borderRadius:3,
-  },
-  lightButtonText: {
-    fontSize:16,
-    color:'#66473b',
-    padding: 3,
-    fontFamily: monospaceFontFamily
-  },
+	lightButtonContainer: {
+		padding: 4,
+		margin: 5,
+		width: 40,
+		height: 30,
+		overflow: 'hidden',
+		borderRadius: 3,
+	},
+	lightButtonText: {
+		fontSize: 16,
+		color: '#66473b',
+		padding: 3,
+		fontFamily: monospaceFontFamily
+	},
 });
+
+export default connect(mapStateToProps, mapDispatchToProps)(Lights);

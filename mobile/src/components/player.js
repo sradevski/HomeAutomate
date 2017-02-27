@@ -2,124 +2,93 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Button from 'react-native-button';
+import { connect } from 'react-redux';
 import SliderWithLabel from './sliderWithLabel';
 import ClickableLabel from './sectionClickableLabel';
 
-const serverUrl = 'http://192.168.11.101:8080/player';
-//const serverUrl = 'http://10.0.2.2:8080/player';
+import {makeServerCall, generateRequestBody, showNotification} from '../shared/utils';
+import {togglePlayer, togglePlay, setVolume, updatePlayerState} from '../state/actions/player';
 
-let requestOptions = {
-	method: 'POST',
-	headers: {
-		'Accept': 'application/json',
-		'Content-Type': 'application/json',
+const mapStateToProps = (state) => ({
+	player: state.player,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+	togglePlayer: () => {
+		dispatch(togglePlayer());
 	},
-};
+	togglePlay: () => {
+		dispatch(togglePlay());
+	},
+	setVolume: (volume) => {
+		dispatch(setVolume(volume));
+	},
+	updatePlayerState: (newState) => {
+		dispatch(updatePlayerState(newState));
+	}
+});
 
-export default class Player extends Component {
-
-	state = {
-		volume: 3,
-		isOn: true,
-		isPlaying: true,
-	};
-
-	componentWillMount() {
-		requestOptions['body'] = JSON.stringify([{
-			name: 'getConfig',
-			args: []
-		}]);
-
-		this.makeServerCall(requestOptions);
+class Player extends Component {
+	componentDidMount(){
+		this.sendToServer(generateRequestBody('getConfig', []));
 	}
 
-	componentWillReceiveProps(newProps) {
-		this.componentWillMount();
-	}
-
-	updateState(newState) {
-		this.setState({
-			volume: newState.volume,
-			isOn: newState.is_on,
-			isPlaying: newState.is_playing,
-		});
-	}
-
-	makeServerCall(requestOptions) {
-		fetch(serverUrl, requestOptions)
-			.then(response => response.json())
-			.then((data) => this.updateState(data));
+	sendToServer(requestBody){
+		makeServerCall('player', requestBody)
+		.then((data) => this.props.updatePlayerState(data))
+		.catch((err) => showNotification(err));
 	}
 
 	changeSong(direction) {
-		requestOptions['body'] = JSON.stringify([{
-			name: 'changeSong',
-			args: [direction]
-		}]);
-
-		this.makeServerCall(requestOptions);
+		this.sendToServer(generateRequestBody('changeSong', [direction]));
 	}
 
 	playToggle() {
-		let nextState = !this.state.isPlaying;
-		this.setState({ isPlaying: nextState });
+		const {player} = this.props;
+		const nextState = !player.isPlaying;
 
-		let args = nextState ? [this.state.volume] : [0];
-		requestOptions['body'] = JSON.stringify([{
-			name: 'playToggle',
-			args: args
-		}]);
-
-		this.makeServerCall(requestOptions);
+		this.props.togglePlay();
+		this.sendToServer(generateRequestBody('playToggle', nextState ? [player.volume] : [0]));
 	}
 
 	playerToggle() {
-		const nextState = !this.state.isOn
-		this.setState({ isOn: nextState });
+		const {player} = this.props;
+		const nextState = !player.isOn;
 
-		let args = nextState ? ['ton'] : ['toff'];
-		requestOptions['body'] = JSON.stringify([{
-			name: 'playerToggle',
-			args: args
-		}]);
-
-		this.makeServerCall(requestOptions);
+		this.props.togglePlayer();
+		this.sendToServer(generateRequestBody('playerToggle', nextState ? ['ton'] : ['toff']));
 	}
 
 	volumeChanged(vol) {
-		this.setState({ volume: vol });
-
-		requestOptions['body'] = JSON.stringify([{
-			name: 'volumeChanged',
-			args: [vol]
-		}]);
-
-		this.makeServerCall(requestOptions);
+		this.props.setVolume(vol);
+		this.sendToServer(generateRequestBody('volumeChanged', [vol]));
 	}
 
 	render() {
-		let playIcon = this.state.isPlaying ? 'md-pause' : 'md-play';
-		let labelColor = this.state.isOn ? 'green' : 'red';
+		const {player} = this.props;
+
+		const playIcon = player.isPlaying ? 'md-pause' : 'md-play';
+		const labelColor = player.isOn ? 'green' : 'red';
 
 		return (
 			<View {...this.props} >
-        <ClickableLabel containerStyle={{flex:3, justifyContent: 'center'}} iconName= 'md-musical-notes'
+        <ClickableLabel containerStyle={{flex: 3, justifyContent: 'center'}} iconName= 'md-musical-notes'
           iconSize= {32} color = {labelColor} backgroundColor = '#FFFCDD' onPress = {() => this.playerToggle()}>
           Player
         </ClickableLabel>
-        <View style={{flex:5, flexDirection:'row', alignItems: 'center'}}>
-          <Button containerStyle ={styles.changeSongButton} disabled = {!this.state.isOn} onPress= { () => this.changeSong('prev')}>
+        <View style={{flex: 5, flexDirection: 'row', alignItems: 'center'}}>
+          <Button containerStyle ={styles.changeSongButton} disabled = {!player.isOn} onPress= { () => this.changeSong('prev')}>
             <Icon name='md-skip-backward' color = 'black' size={textSizes.iconSize}></Icon>
           </Button>
-          <Button containerStyle ={styles.playButton} disabled = {!this.state.isOn} onPress= {() => this.playToggle()}>
+          <Button containerStyle ={styles.playButton} disabled = {!player.isOn} onPress= {() => this.playToggle()}>
             <Icon name={playIcon} color = 'black' size={textSizes.iconSize}></Icon>
           </Button>
-          <Button containerStyle = {styles.changeSongButton} disabled = {!this.state.isOn} onPress= {() => this.changeSong('next')}>
+          <Button containerStyle = {styles.changeSongButton} disabled = {!player.isOn} onPress= {() => this.changeSong('next')}>
             <Icon name='md-skip-forward' color = 'black' size={textSizes.iconSize}></Icon>
           </Button>
         </View>
-        <View style={{flex:4, alignItems: 'center'}}>
-          <SliderWithLabel minimumValue={1} maximumValue={9} step={1} disabled = {!this.state.isOn} value = {this.state.volume} onSlidingComplete={(val) => this.volumeChanged(val)}></SliderWithLabel>
+        <View style={{flex: 4, alignItems: 'center'}}>
+          <SliderWithLabel minimumValue={1} maximumValue={9} step={1} disabled = {!player.isOn} value = {player.volume} onSlidingComplete={(val) => this.volumeChanged(val)}></SliderWithLabel>
         </View>
       </View>
 		);
@@ -147,4 +116,6 @@ const styles = StyleSheet.create({
 
 const textSizes = {
 	iconSize: 36,
-}
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Player);

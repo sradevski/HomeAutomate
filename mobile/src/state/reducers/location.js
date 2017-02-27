@@ -1,4 +1,4 @@
-function lights(state = {}, action) {
+function location(state = {}, action) {
 	switch (action.type) {
 		case 'TOGGLE_LIGHT':
 			return {
@@ -12,4 +12,4 @@ function lights(state = {}, action) {
 	}
 }
 
-export default lights;
+export default location;

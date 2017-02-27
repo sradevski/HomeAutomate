@@ -1,80 +1,21 @@
 import React, { Component } from 'react';
 import { Text, View } from 'react-native';
+import { connect } from 'react-redux';
+
 import HotkeyButton from './hotkeyButton';
-
-const serverUrl = 'http://192.168.11.101:8080/hotkeys';
-//const serverUrl = 'http://10.0.2.2:8080/hotkeys';
-
-let requestOptions = {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-};
+import {makeServerCall, generateRequestBody} from '../shared/utils';
 
 export default class Hotkeys extends Component {
-
-	state = {
-		isHome: true,
-	}
-
-	updateState(serverData){
-		this.setState({
-			isHome: serverData.am_home
-		});
-
-		this.props.reflectChangeToComponents();
-	}
-
-	makeServerCall(requestOptions){
-		fetch(serverUrl, requestOptions)
-			.then(response => response.json())
-			.then((data) => this.updateState(data));
-	}
-
-	componentWillMount(){
-		requestOptions['body'] = JSON.stringify([
-			{
-				name: 'getConfig',
-				args: []
-			}
-		]);
-
-		this.makeServerCall(requestOptions);
-	}
-
 	cameHome() {
-		requestOptions['body'] = JSON.stringify([
-			{
-				name: 'comeHome',
-				args: []
-			}
-		]);
-
-		this.makeServerCall(requestOptions);
+    this.sendToServer(generateRequestBody('comeHome', []));
 	}
 
 	goSleep() {
-		requestOptions['body'] = JSON.stringify([
-			{
-				name: 'goSleep',
-				args: []
-			}
-		]);
-
-		this.makeServerCall(requestOptions);
+    this.sendToServer(generateRequestBody('goSleep', []));
 	}
 
 	offAll(inMin) {
-		requestOptions['body'] = JSON.stringify([
-			{
-				name: 'offAll',
-				args: [inMin]
-			}
-		]);
-
-		this.makeServerCall(requestOptions);
+    this.sendToServer(generateRequestBody('offAll', [inMin]));
 	}
 
 	render() {

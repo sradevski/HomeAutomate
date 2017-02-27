@@ -1,159 +1,132 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Button from 'react-native-button';
 import ClickableLabel from './sectionClickableLabel';
 
-const serverUrl = 'http://192.168.11.101:8080/aircon';
-//const serverUrl = 'http://10.0.2.2:8080/aircon';
+import {makeServerCall, generateRequestBody, showNotification} from '../shared/utils';
+import {toggleAircon, toggleAirconMode, setTemperature, updateAirconState} from '../state/actions/aircon';
 
-let requestOptions = {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-};
+const mapStateToProps = (state) => ({
+	aircon: state.aircon,
+});
 
-export default class Aircon extends Component {
+const mapDispatchToProps = (dispatch) => ({
+	toggleAircon: () => {
+		dispatch(toggleAircon());
+	},
+	toggleAirconMode: () => {
+		dispatch(toggleAirconMode());
+	},
+	setTemperature: (temp) => {
+		dispatch(setTemperature(temp));
+	},
+	updateAirconState: (newState) => {
+		dispatch(updateAirconState(newState));
+	}
+});
 
-  state = {
-    isOn: true,
-    mode: 'cooling',
-    temperature: 23,
-  }
+class Aircon extends Component {
+	componentDidMount(){
+		this.sendToServer(generateRequestBody('getConfig', []));
+	}
 
-  updateState(serverData){
-    this.setState({isOn: serverData.is_on,
-      mode: serverData.mode,
-      temperature: serverData.temperature
-    });
-  }
+	sendToServer(requestBody){
+		makeServerCall('aircon', requestBody)
+		.then((data) => this.props.updateAirconState(data))
+		.catch((err) => showNotification(err));
+	}
 
-  makeServerCall(requestOptions){
-    fetch(serverUrl, requestOptions)
-      .then(response => response.json())
-      .then((data) => this.updateState(data));
-  }
+	toggleAircon(){
+		const {temperature, mode, isOn} = this.props.aircon;
 
-  componentWillMount(){
-    requestOptions['body'] = JSON.stringify([
-      {
-        name: 'getConfig',
-        args: []
-      }
-    ]);
+		//The arguments used as command line parameters on the server side.
+		let args = [temperature, mode];
+		if (isOn){
+			args = [0];
+		}
 
-    this.makeServerCall(requestOptions);
-  }
+		this.props.toggleAircon();
+		this.sendToServer(generateRequestBody('toggleAircon', args));
+	}
 
-  componentWillReceiveProps(newProps){
-    this.componentWillMount();
-  }
+	toggleAirconMode(){
+		const {temperature, mode} = this.props.aircon;
+		const args = [temperature, mode === 'cooling' ? 'heating' : 'cooling'];
 
-  toggleAircon(){
-    const nextState = !this.state.isOn
-    this.setState({isOn: nextState});
+		this.props.toggleAirconMode();
+		this.sendToServer(generateRequestBody('toggleAirconMode', args));
+	}
 
-    let args = [0];
-    if(nextState){
-      args = [this.state.temperature, this.state.mode];
-    }
+	temperatureChanged(degrees){
+		const {temperature} = this.props.aircon;
 
-    requestOptions['body'] = JSON.stringify([
-      {
-        name: 'toggleAircon',
-        args: args
-      }
-    ]);
+		this.props.setTemperature(temperature + degrees);
+		this.sendToServer(generateRequestBody('temperatureChanged', [temperature + degrees]));
+	}
 
-    this.makeServerCall(requestOptions);
-  }
+	render(){
+		const {mode, isOn, temperature} = this.props.aircon;
 
-  toggleAirconMode(){
-    let nextState =  this.state.mode === 'cooling' ? 'heating' : 'cooling';
-    this.setState({mode: nextState});
+		const modeIcon = mode === 'cooling' ? 'md-snow' : 'md-flame';
+		const modeColor = mode === 'cooling' ? {backgroundColor: 'lightblue'} : {backgroundColor: 'red'};
+		const modeText = mode === 'cooling' ? 'C' : 'H';
+		const labelColor = isOn ? 'green' : 'red';
 
-    requestOptions['body'] = JSON.stringify([
-      {
-        name: 'toggleAirconMode',
-        args: [this.state.temperature, nextState]
-      }
-    ]);
+		return (
+			<View {...this.props}>
+				<ClickableLabel containerStyle={{flex: 6, justifyContent: 'center'}} iconName= 'md-thermometer'
+					iconSize= {32} color = {labelColor} backgroundColor = 'lightsalmon' onPress = {() => this.toggleAircon()}>
+					Aircon
+				</ClickableLabel>
 
-    this.makeServerCall(requestOptions);
-  }
+				<View style={{flex: 6, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+					<View style={{flex: 4, alignItems: 'center'}}>
+						<Button containerStyle = {[styles.modeButton, modeColor]} disabled= {!isOn} onPress= {() => this.toggleAirconMode()}>
+							<Icon name={modeIcon} color = 'white' style={{textAlign: 'center'}} size={36}></Icon>
+						</Button>
+					</View>
 
-  temperatureChanged(degrees){
-    this.setState({temperature: this.state.temperature += degrees});
+					<View style={{flex: 8, flexDirection: 'row', alignItems: 'center'}}>
+						<Button containerStyle ={styles.temperatureButton} disabled= {!isOn} onPress= {() => this.temperatureChanged(-1)}>
+							<Icon name='ios-arrow-dropleft' color = 'white' size={36}>
+							</Icon>
+						</Button>
 
-    requestOptions['body'] = JSON.stringify([
-      {
-        name: 'temperatureChanged',
-        args: [this.state.temperature]
-      }
-    ]);
+						<Text style={{color: 'white', fontSize: 26, textAlign: 'center'}}>{temperature}</Text>
 
-    this.makeServerCall(requestOptions);
-  }
-
-  render(){
-    let modeIcon = this.state.mode === 'cooling' ? 'md-snow' : 'md-flame';
-    let modeColor = this.state.mode === 'cooling' ? {backgroundColor: 'lightblue'} : {backgroundColor:'red'};
-    let modeText = this.state.mode === 'cooling' ? 'C' : 'H';;
-    let labelColor = this.state.isOn ? 'green' : 'red';
-
-    return (
-      <View {...this.props}>
-        <ClickableLabel containerStyle={{flex:6, justifyContent: 'center'}} iconName= 'md-thermometer'
-          iconSize= {32} color = {labelColor} backgroundColor = 'lightsalmon' onPress = {() => this.toggleAircon()}>
-          Aircon
-        </ClickableLabel>
-
-        <View style={{flex:6, flexDirection:'row', alignItems: 'center', justifyContent:'center'}}>
-          <View style={{flex:4, alignItems: 'center'}}>
-            <Button containerStyle = {[styles.modeButton, modeColor]} disabled= {!this.state.isOn} onPress= {() => this.toggleAirconMode()}>
-              <Icon name={modeIcon} color = 'white' style={{textAlign: 'center'}} size={36}></Icon>
-            </Button>
-          </View>
-
-          <View style={{flex:8, flexDirection: 'row', alignItems: 'center'}}>
-            <Button containerStyle ={styles.temperatureButton} disabled= {!this.state.isOn} onPress= {() => this.temperatureChanged(-1)}>
-              <Icon name='ios-arrow-dropleft' color = 'white' size={36}>
-              </Icon>
-            </Button>
-
-            <Text style={{color: 'white', fontSize: 26, textAlign: 'center'}}>{this.state.temperature}</Text>
-
-            <Button containerStyle ={styles.temperatureButton} disabled= {!this.state.isOn} onPress= {() => this.temperatureChanged(1)}>
-              <Icon name='ios-arrow-dropright' color = 'white' size={36}>
-              </Icon>
-            </Button>
-          </View>
-        </View>
-      </View>
-    );
-  }
+						<Button containerStyle ={styles.temperatureButton} disabled= {!isOn} onPress= {() => this.temperatureChanged(1)}>
+							<Icon name='ios-arrow-dropright' color = 'white' size={36}>
+							</Icon>
+						</Button>
+					</View>
+				</View>
+			</View>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  modeButton: {
-    padding:4,
-    margin: 3,
-    width: 40,
-    height: 40,
-    overflow:'hidden',
-    borderRadius:3,
-    backgroundColor:
-    'lightblue',
-    justifyContent: 'center'
-  },
+	modeButton: {
+		padding: 4,
+		margin: 3,
+		width: 40,
+		height: 40,
+		overflow: 'hidden',
+		borderRadius: 3,
+		backgroundColor:
+		'lightblue',
+		justifyContent: 'center'
+	},
 
-  temperatureButton: {
-    padding:4,
-    margin: 5,
-    overflow:'hidden',
-    borderRadius:3,
-    backgroundColor: 'lightsalmon'
-  }
+	temperatureButton: {
+		padding: 4,
+		margin: 5,
+		overflow: 'hidden',
+		borderRadius: 3,
+		backgroundColor: 'lightsalmon'
+	}
 });
+
+export default connect(mapStateToProps, mapDispatchToProps)(Aircon);
