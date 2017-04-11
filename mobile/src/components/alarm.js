@@ -30,13 +30,13 @@ const mapDispatchToProps = (dispatch) => ({
 
 class Alarm extends Component {
 	componentDidMount() {
-		this.sendToServer(generateRequestBody('getConfig', []));
+		this.sendToServer(generateRequestBody('getState', []));
 	}
 
 	sendToServer(requestBody){
 		makeServerCall('alarm', requestBody)
 		.then((data) => this.props.updateAlarmState(data))
-		.catch((err) => showNotification(err));
+		.catch((err) => showNotification('Oops, it didn\'t work.'));
 	}
 
 	toggleAlarm() {

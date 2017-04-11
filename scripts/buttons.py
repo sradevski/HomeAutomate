@@ -6,7 +6,6 @@ import remote_core as core
 import radio_lights
 import player
 import aircon
-import main_light
 import come_home
 import off_all
 import go_to_sleep
@@ -122,16 +121,11 @@ def handle_on_off():
 		if config["player"]["is_on"]:
 			go_to_sleep.go_to_sleep()
 		else:
-			come_home.turn_on_all(True, [])	
+			come_home.turn_on_all([])	
 
 	elif counter >= 3 and counter <= 6:
 		off_all.turn_off_all([])
-	elif counter > 6:
-		if config["lights"]["main_light"]["is_on"]:
-			main_light.turn_off(config["lights"]["main_light"], "main_light")
-		else:
-			main_light.turn_on_full(config["lights"]["main_light"], "main_light")
-		core.write_config(config)
+	#No need to save config, as it is handled in come_home, go_to_sleep, and off_all.
 
 def count_button_hold():
 	counter = 0

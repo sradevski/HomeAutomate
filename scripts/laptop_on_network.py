@@ -44,7 +44,7 @@ def checkIfLaptopOn():
 	print(host)
 
     config = core.load_config();
-    if config['steve']['am_home']:
+    if config['location']['am_home']:
         if macAddressToSearch not in curHosts:
 	    if laptopHasBeenTurnedOn:
 		if disconnectedCounter > 3:       

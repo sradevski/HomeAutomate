@@ -46,25 +46,6 @@
         "is_on": false
     },
     "lights": {
-        "main_light": {
-            "commands": {
-                "full": "FULL",
-                "timer_off": "TIMER_OFF",
-                "intensity_increase": "INCREASE_BRIGHTNESS",
-                "smooth": "SMOOTH",
-                "intensity_decrease": "DECREASE_BRIGHTNESS",
-                "off": "OFF",
-                "red": "RED"
-            },
-            "is_on": false,
-            "intensity_max": 19,
-            "intensity_smooth": 0,
-            "intensity": 19,
-            "is_red": false,
-            "is_full": false,
-            "intensity_min": 0,
-            "is_smooth": false
-        },
         "desk_light": {
             "commands": {
                 "desk_off_binary": "111100000000",

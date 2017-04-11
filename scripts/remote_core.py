@@ -29,21 +29,17 @@ def _safe_repr(object, context, maxlevels, level):
 def print_config():
 	config = load_config()
 	del config["aircon"]["commands"]
-	del config["main_light"]["commands"]
 	del config["player"]["commands"]
 
-	del config["radio_lights"]["desk_light"]["commands"]
-	del config["radio_lights"]["door_light"]["commands"]
-	del config["radio_lights"]["shelf_light"]["commands"]
+	del config["lights"]["desk_light"]["commands"]
+	del config["lights"]["door_light"]["commands"]
+	del config["lights"]["shelf_light"]["commands"]
 
 	del config["aircon"]["cooling_temperature_max"]
 	del config["aircon"]["cooling_temperature_min"]
 	del config["aircon"]["heating_temperature_max"]
 	del config["aircon"]["heating_temperature_min"]
 	del config["aircon"]["possible_modes"]
-
-	del config["main_light"]["intensity_max"]
-	del config["main_light"]["intensity_min"]
 
 	del config["player"]["volume_max"]
 	del config["player"]["volume_min"]

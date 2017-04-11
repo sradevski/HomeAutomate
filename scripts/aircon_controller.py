@@ -7,8 +7,8 @@ import aircon
 def main(argv):
 	config = core.load_config()
 	
-	mode_param = "c"
-	temp_param = 26
+	mode_param = config["aircon"]["mode"]
+	temp_param = config["aircon"]["temperature"]
 	turn_on_if_not_home = "t"
 
 	if len(argv) == 3:
@@ -30,7 +30,7 @@ def main(argv):
 		elif mode_param == "h" or mode_param == "heating":
 			mode_param = "heating"
 
-		if turn_on_if_not_home == "t" or config["steve"]["am_home"]:
+		if turn_on_if_not_home == "t" or config["location"]["am_home"]:
 			aircon.turn_on_with_mode_temperature(config['aircon'], 'aircon', mode_param, temp_param)	
 		
 	core.write_config(config)

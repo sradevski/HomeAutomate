@@ -2,7 +2,6 @@ const fs = require('fs'),
 	pythonCaller = require('./pythonCaller');
 
 const configUri = '/home/pi/scripts/config.json',
-//const configUri = '/Users/sradevski/Documents/My\ Programming\ Projects/HomeAutomateServer/config.json',
 	scriptsFolder = '/home/pi/scripts/',
 	cacheTimeToLiveMs = 3000;
 let configCache;
@@ -43,7 +42,7 @@ function executeAirconCommands(req, res) {
 	let configSelector = 'aircon';
 	functionList.forEach(func => {
 		switch (func.name) {
-			case 'getConfig':
+			case 'getState':
 				sendConfigToClient(configSelector, (data) => res.send(data))
 				break;
 			case 'toggleAirconMode':
@@ -60,7 +59,7 @@ function executeLightsCommands(req, res) {
 	let configSelector = 'lights';
 	functionList.forEach(func => {
 		switch (func.name) {
-			case 'getConfig':
+			case 'getState':
 				sendConfigToClient(configSelector, (data) => res.send(data))
 				break;
 			case 'toggleAllLights':
@@ -77,7 +76,7 @@ function executePlayerCommands(req, res) {
 	let configSelector = 'player';
 	functionList.forEach(func => {
 		switch (func.name) {
-			case 'getConfig':
+			case 'getState':
 				sendConfigToClient(configSelector, (data) => res.send(data))
 				break;
 			case 'playToggle':
@@ -95,7 +94,7 @@ function executeAlarmCommands(req, res) {
 	let configSelector = 'alarm';
 	functionList.forEach(func => {
 		switch (func.name) {
-			case 'getConfig':
+			case 'getState':
 				sendConfigToClient(configSelector, (data) => res.send(data))
 				break;
 			case 'alarmToggle':
@@ -110,7 +109,7 @@ function executeHotkeyCommands(req, res) {
 	let configSelector = 'steve';
 	functionList.forEach(func => {
 		switch (func.name) {
-			case 'getConfig':
+			case 'getState':
 				sendConfigToClient(configSelector, (data) => res.send(data))
 				break;
 			case 'comeHome':

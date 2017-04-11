@@ -1,11 +1,11 @@
 function location(state = {}, action) {
 	switch (action.type) {
-		case 'TOGGLE_LIGHT':
+		case 'UPDATE_GEOLOCATION':
 			return {
         ...state,
 				[action.lightId]: !state[action.lightId]
       };
-		case 'UPDATE_LIGHTS_STATE':
+		case 'UPDATE_LOCATION_STATE':
 			return action.newState;
 		default:
 			return state;

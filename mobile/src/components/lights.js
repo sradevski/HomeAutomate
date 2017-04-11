@@ -24,13 +24,13 @@ const mapDispatchToProps = (dispatch) => ({
 
 class Lights extends Component {
 	componentDidMount(){
-		this.sendToServer(generateRequestBody('getConfig', []));
+		this.sendToServer(generateRequestBody('getState', []));
 	}
 
 	sendToServer(requestBody){
 		makeServerCall('lights', requestBody)
 		.then((data) => this.props.updateLightsState(data))
-		.catch((err) => showNotification(err));
+		.catch((err) => showNotification('Oops, it didn\'t work.'));
 	}
 
 	toggleAllLights(shouldSetAllOn = false){
@@ -86,7 +86,7 @@ class Lights extends Component {
 	}
 }
 
-const lightIdMap = {'EN': '1', 'DK': '2', 'SF': 3};
+const lightIdMap = {'EN': '1', 'BD': '2', 'DK': 3};
 const monospaceFontFamily = Platform.OS === 'android' ? 'monospace': 'Courier New';
 
 const styles = StyleSheet.create({

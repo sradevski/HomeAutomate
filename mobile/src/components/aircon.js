@@ -29,13 +29,13 @@ const mapDispatchToProps = (dispatch) => ({
 
 class Aircon extends Component {
 	componentDidMount(){
-		this.sendToServer(generateRequestBody('getConfig', []));
+		this.sendToServer(generateRequestBody('getState', []));
 	}
 
 	sendToServer(requestBody){
 		makeServerCall('aircon', requestBody)
 		.then((data) => this.props.updateAirconState(data))
-		.catch((err) => showNotification(err));
+		.catch((err) => showNotification('Oops, it didn\'t work.'));
 	}
 
 	toggleAircon(){

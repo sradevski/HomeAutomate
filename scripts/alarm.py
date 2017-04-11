@@ -46,12 +46,12 @@ def main(argv):
 		config["alarm"]["is_on"] = True
 		timing_part = minute_param + " " + hour_param + " " + day_param + " " + month_param + " * "
 		timing_part_aircon = minute_param + " " + str(int(hour_param) - 1) + " " + day_param + " " + month_param + " * "
-		param_command = timing_part + "~/scripts/player_controller.py 5 1800"
-		param_command_aircon = timing_part_aircon + "~/scripts/aircon_controller.py 27 c f"
+		param_command = timing_part + "~/scripts/player_controller.py 4 1800"
+		param_command_aircon = timing_part_aircon + "~/scripts/aircon_controller.py 24 h f"
 		command ="(crontab -l ; echo \'" + param_command + "\') | sort - | uniq - | crontab -"
 		command_aircon ="(crontab -l ; echo \'" + param_command_aircon + "\') | sort - | uniq - | crontab -"
 		core.run_bash_command(command)
-#		core.run_bash_command(command_aircon)
+		core.run_bash_command(command_aircon)
 	
 	core.write_config(config)
 	

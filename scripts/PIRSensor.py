@@ -19,7 +19,7 @@ while True:
     if current_state == 1:
         localtime = time.localtime(time.time())
     	config = core.load_config()
-   	if config['steve']['am_home'] == True:
+   	if config['location']['am_home'] == True:
 	    time.sleep(300)
 #	    if localtime.tm_hour > start_at_hour and localtime.tm_hour < start_at_hour + 3:
 #		if config['player']['is_playing'] and config['player']['volume'] != 3:

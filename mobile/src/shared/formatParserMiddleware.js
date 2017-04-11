@@ -1,11 +1,6 @@
 import _ from 'lodash';
 
 export default function parseServerFormatMiddleware(state, componentName){
-  //TODO: remove this once fixed on server-side.
-  if (state.steve){
-    state.location = state.steve;
-  }
-
 	return new Promise((resolve, reject) => {
     if (componentName){
       resolve(parsersContainer[componentName](state));
@@ -53,6 +48,6 @@ parsersContainer.player = (state) => ({
 
 parsersContainer.lights = (state) => ({
   'EN': state.door_light.is_on,
-  'DK': state.desk_light.is_on,
-  'SF': state.shelf_light.is_on,
+  'BD': state.desk_light.is_on,
+  'DK': state.shelf_light.is_on,
 });

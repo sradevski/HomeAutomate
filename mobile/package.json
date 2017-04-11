@@ -7,9 +7,10 @@
         "test": "jest"
     },
     "dependencies": {
+        "base-64": "^0.1.0",
         "lodash": "^4.17.4",
         "react": "15.4.2",
-        "react-native": "0.41.2",
+        "react-native": "0.42.3",
         "react-native-button": "^1.8.2",
         "react-native-statusbar-alert": "^0.0.2",
         "react-native-vector-icons": "^4.0.0",

@@ -1,5 +1,4 @@
 import uuid from 'uuid/v4';
-
 import {serverUrl, requestOptions} from './constants';
 import parseServerFormatMiddleware from './formatParserMiddleware';
 
@@ -20,7 +19,7 @@ export function generateRequestBody(name, args){
 	}]);
 }
 
-export function generateNotificationFunction(addAction, removeAction) {
+export function initializeNotificationFunction(addAction, removeAction) {
 	showNotification = (message) => {
 		const id = uuid();
 		addAction(message, id);
