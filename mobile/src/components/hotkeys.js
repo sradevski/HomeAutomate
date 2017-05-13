@@ -42,7 +42,7 @@ class Hotkeys extends Component {
 	render() {
 		return (
 			<View {...this.props}>
-      <HotkeyButton backgroundColor = 'red' iconName = 'md-power' onPress = {() => this.offAll(3)} onLongPress={() => this.offAll(0)}>
+      <HotkeyButton backgroundColor = 'red' iconName = 'md-power' onPress = {() => this.offAll(0)} onLongPress={() => this.offAll(3)}>
         Off All
       </HotkeyButton>
 

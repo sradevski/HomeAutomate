@@ -89,7 +89,7 @@ class Lights extends Component {
 	}
 }
 
-const lightIdMap = {'EN': '1', 'BD': '2', 'DK': 3};
+const lightIdMap = {'BD': '1', 'DK': '2', 'EN': 3};
 const monospaceFontFamily = Platform.OS === 'android' ? 'monospace': 'Courier New';
 
 const styles = StyleSheet.create({

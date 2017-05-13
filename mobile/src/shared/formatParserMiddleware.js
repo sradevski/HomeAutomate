@@ -47,7 +47,7 @@ parsersContainer.player = (state) => ({
 });
 
 parsersContainer.lights = (state) => ({
-  'EN': state.door_light.is_on,
-  'BD': state.desk_light.is_on,
-  'DK': state.shelf_light.is_on,
+  'EN': state.shelf_light.is_on,
+  'BD': state.door_light.is_on,
+  'DK': state.desk_light.is_on,
 });
