@@ -7,8 +7,9 @@ import _ from 'lodash';
 import SliderWithLabel from './sliderWithLabel';
 import ClickableLabel from './sectionClickableLabel';
 
-import {makeServerCall, generateRequestBody, showNotification} from '../shared/utils';
+import {makeServerCall, generateRequestBody} from '../shared/utils';
 import {toggleAlarm, setAlarmTime, updateAlarmState} from '../state/actions/alarm';
+import {showNotification, changeConnectionStatus} from '../state/actions/appState';
 
 const Item = Picker.Item;
 
@@ -25,18 +26,21 @@ const mapDispatchToProps = (dispatch) => ({
 	},
 	updateAlarmState: (newState) => {
 		dispatch(updateAlarmState(newState));
+	},
+	showNetworkStatus: (message) => {
+		dispatch(changeConnectionStatus(message));
+	},
+	showNotification: (message) => {
+		dispatch(showNotification(message));
 	}
 });
 
 class Alarm extends Component {
-	componentDidMount() {
-		this.sendToServer(generateRequestBody('getState', []));
-	}
-
 	sendToServer(requestBody){
+			this.props.showNetworkStatus('Fetching...');
 		makeServerCall('alarm', requestBody)
-		.then((data) => this.props.updateAlarmState(data))
-		.catch((err) => showNotification('Oops, it didn\'t work.'));
+		.then((data) => { this.props.updateAlarmState(data);	this.props.showNetworkStatus('Fetched alarm data'); })
+		.catch((err) => { this.props.showNotification(`Oops, something didn't work`);	this.props.showNetworkStatus('Fetching failed.'); });
 	}
 
 	toggleAlarm() {

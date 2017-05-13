@@ -6,8 +6,9 @@ import { connect } from 'react-redux';
 import SliderWithLabel from './sliderWithLabel';
 import ClickableLabel from './sectionClickableLabel';
 
-import {makeServerCall, generateRequestBody, showNotification} from '../shared/utils';
+import {makeServerCall, generateRequestBody} from '../shared/utils';
 import {togglePlayer, togglePlay, setVolume, updatePlayerState} from '../state/actions/player';
+import {showNotification, changeConnectionStatus} from '../state/actions/appState';
 
 const mapStateToProps = (state) => ({
 	player: state.player,
@@ -25,18 +26,21 @@ const mapDispatchToProps = (dispatch) => ({
 	},
 	updatePlayerState: (newState) => {
 		dispatch(updatePlayerState(newState));
+	},
+	showNetworkStatus: (message) => {
+		dispatch(changeConnectionStatus(message));
+	},
+	showNotification: (message) => {
+		dispatch(showNotification(message));
 	}
 });
 
 class Player extends Component {
-	componentDidMount(){
-		this.sendToServer(generateRequestBody('getState', []));
-	}
-
 	sendToServer(requestBody){
+		this.props.showNetworkStatus('Fetching...');
 		makeServerCall('player', requestBody)
-		.then((data) => this.props.updatePlayerState(data))
-		.catch((err) => showNotification('Oops, it didn\'t work.'));
+		.then((data) => { this.props.updatePlayerState(data); 	this.props.showNetworkStatus('Fetched player data.'); })
+		.catch((err) => { this.props.showNotification('Oops, it didn\'t work.'); 	this.props.showNetworkStatus('Fetching failed.'); });
 	}
 
 	changeSong(direction) {

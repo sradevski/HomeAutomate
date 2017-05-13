@@ -4,8 +4,22 @@ import { connect } from 'react-redux';
 
 import HotkeyButton from './hotkeyButton';
 import {makeServerCall, generateRequestBody} from '../shared/utils';
+import {showNotification, changeConnectionStatus} from '../state/actions/appState';
+import {setEntireState} from '../state/rootActions';
 
-export default class Hotkeys extends Component {
+const mapDispatchToProps = (dispatch) => ({
+	showNetworkStatus: (message) => {
+		dispatch(changeConnectionStatus(message));
+	},
+	showNotification: (message) => {
+		dispatch(showNotification(message));
+	},
+	setEntireState: (state) => {
+		dispatch(setEntireState(state));
+	}
+});
+
+class Hotkeys extends Component {
 	cameHome() {
     this.sendToServer(generateRequestBody('comeHome', []));
 	}
@@ -18,6 +32,13 @@ export default class Hotkeys extends Component {
     this.sendToServer(generateRequestBody('offAll', [inMin]));
 	}
 
+	sendToServer(requestBody){
+		this.props.showNetworkStatus('Fetching...');
+		makeServerCall('hotkeys', requestBody)
+		.then((data) => { this.props.setEntireState(data);	this.props.showNetworkStatus('Fetched entire data'); })
+		.catch((err) => { this.props.showNotification('Oops, it didn\'t work.'); 	this.props.showNetworkStatus('Fetching failed.'); });
+	}
+
 	render() {
 		return (
 			<View {...this.props}>
@@ -25,14 +46,17 @@ export default class Hotkeys extends Component {
         Off All
       </HotkeyButton>
 
+      <HotkeyButton backgroundColor = '#003300' iconName = 'md-home' onPress = {() => this.cameHome()}>
+        Home
+      </HotkeyButton>
+
       <HotkeyButton backgroundColor = '#1b0b58' iconName = 'md-moon' onPress = {() => this.goSleep()}>
         Sleeping
       </HotkeyButton>
 
-      <HotkeyButton backgroundColor = '#003300' iconName = 'md-home' onPress = {() => this.cameHome()}>
-        Home
-      </HotkeyButton>
     </View>
 		);
 	}
 }
+
+export default connect(null, mapDispatchToProps)(Hotkeys);

@@ -5,17 +5,17 @@ const express = require('express'),
   basicAuth = require('express-basic-auth'),
   requestCallbacks = require('./requestCallbacks');
 
-const port = 8080,
+const port = 80,
   app = express();
 
-//The location of certificates and user info are just placeholders.
   var sslOptions = {
-      key: fs.readFileSync('keylocation.crt'),
-      cert: fs.readFileSync('certlocation.crt'),
+      key: fs.readFileSync('privkeylocation'),
+      cert: fs.readFileSync('certlocation'),
+      ca: fs.readFileSync('chainlocation')
   };
 
 app.use(basicAuth({
-	users: {'blaaa': 'blaa'},
+	users: {'secret': 'secret'},
 unauthorizedResponse: 'You are not authorized to access.'
 }));
 app.use(bodyParser.json());
@@ -25,7 +25,10 @@ app.post('/player', (req, res) => requestCallbacks.executePlayerCommands(req, re
 app.post('/lights', (req, res) => requestCallbacks.executeLightsCommands(req, res));
 app.post('/alarm', (req, res) => requestCallbacks.executeAlarmCommands(req, res));
 app.post('/hotkeys', (req, res) => requestCallbacks.executeHotkeyCommands(req, res));
+app.post('/location', (req, res) => requestCallbacks.executeLocationCommands(req, res));
+app.post('/state', (req, res) => requestCallbacks.executeStateCommands(req, res));
 
 https.createServer(sslOptions, app).listen(port, () => {
-  console.log(`Server started on port ${port}`);
+//app.listen(port, () => {
+ console.log(`Server started on port ${port}`);
 });

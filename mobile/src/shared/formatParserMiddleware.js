@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 export default function parseServerFormatMiddleware(state, componentName){
 	return new Promise((resolve, reject) => {
-    if (componentName){
+    if (componentName !== 'state' && componentName !== 'hotkeys'){
       resolve(parsersContainer[componentName](state));
     }
 

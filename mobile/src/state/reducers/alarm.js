@@ -6,7 +6,6 @@ function alarm(state = {}, action) {
 				isOn: !state.isOn
       };
 		case 'SET_ALARM_TIME':
-			console.warn(JSON.stringify(action.time));
 			return {
         ...state,
 				timeData: action.time

@@ -8,9 +8,9 @@ export default function HotkeyButton (props){
 
     return (
       <Button containerStyle ={[styles.hotkeyContainer, {backgroundColor}]} onPress= {onPress} onLongPress = {onLongPress}>
-        <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-        <Icon name={iconName} color = 'white' size={64}></Icon>
-        <Text style={{fontSize: 24, textAlign: 'center', color: 'white', marginTop: 8}}>{children}</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+          <Icon style={{}} name={iconName} color = 'white' size={42}></Icon>
+          <Text style={{fontSize: 20, textAlign: 'center', color: 'white', marginLeft: 8}}>{children}</Text>
         </View>
       </Button>
     );
@@ -19,8 +19,7 @@ export default function HotkeyButton (props){
 const styles = StyleSheet.create({
   hotkeyContainer: {
 		flex: 4,
-		padding: 4,
-		margin: 5,
+		margin: 4,
 		overflow: 'hidden',
 		borderRadius: 3,
 		backgroundColor: 'red',

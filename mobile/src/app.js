@@ -4,6 +4,8 @@ import {createStore} from 'redux';
 import rootReducer from './state/rootReducer';
 import RootContainer from './rootContainer';
 
+GLOBAL.XMLHttpRequest = GLOBAL.originalXMLHttpRequest || GLOBAL.XMLHttpRequest;
+
 function configApp() {
 		//This can be from persistent storage for example.
 		const initialState = {
@@ -11,7 +13,7 @@ function configApp() {
 			lights: { 'EN': false, 'BD': false, 'DK': false},
 			alarm: {isOn: false, timeData: {hour: '8', minute: '15'}},
 			player: {volume: 3, isOn: true, isPlaying: true, },
-			appState: {useState: 'active', isSyncedWithServer: false},
+			appState: {useState: 'active', connectionStatus: 'Idle', notification: ''},
 			location: {isHome: true},
 		};
 

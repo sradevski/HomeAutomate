@@ -1,13 +1,9 @@
 package com.homeautomate;
 
 import android.app.Application;
-
 import com.facebook.react.ReactApplication;
-<<<<<<< ours
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactInstanceManager;
-=======
->>>>>>> theirs
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;

@@ -5,8 +5,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Button from 'react-native-button';
 import ClickableLabel from './sectionClickableLabel';
 
-import {makeServerCall, generateRequestBody, showNotification} from '../shared/utils';
+import {makeServerCall, generateRequestBody} from '../shared/utils';
 import {toggleAircon, toggleAirconMode, setTemperature, updateAirconState} from '../state/actions/aircon';
+import {showNotification, changeConnectionStatus} from '../state/actions/appState';
 
 const mapStateToProps = (state) => ({
 	aircon: state.aircon,
@@ -24,18 +25,21 @@ const mapDispatchToProps = (dispatch) => ({
 	},
 	updateAirconState: (newState) => {
 		dispatch(updateAirconState(newState));
+	},
+	showNetworkStatus: (message) => {
+		dispatch(changeConnectionStatus(message));
+	},
+	showNotification: (message) => {
+		dispatch(showNotification(message));
 	}
 });
 
 class Aircon extends Component {
-	componentDidMount(){
-		this.sendToServer(generateRequestBody('getState', []));
-	}
-
 	sendToServer(requestBody){
+		this.props.showNetworkStatus('Fetching...');
 		makeServerCall('aircon', requestBody)
-		.then((data) => this.props.updateAirconState(data))
-		.catch((err) => showNotification('Oops, it didn\'t work.'));
+		.then((data) => { this.props.updateAirconState(data); this.props.showNetworkStatus('Fetched aircon data.'); })
+		.catch((err) => { this.props.showNotification('Oops, it didn\'t work.'); this.props.showNetworkStatus('Fetch failed.'); } );
 	}
 
 	toggleAircon(){

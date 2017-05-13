@@ -8,7 +8,7 @@ export function makeServerCall(componentName, requestBody){
 			.then((response) => response.json())
 			.then((data) => parseServerFormatMiddleware(data, componentName))
 			.then((data) => resolve(data))
-			.catch((err) => reject(err));
+			.catch((err) => { console.warn(err); reject(err); });
 	});
 }
 
@@ -18,13 +18,3 @@ export function generateRequestBody(name, args){
 		args
 	}]);
 }
-
-export function initializeNotificationFunction(addAction, removeAction) {
-	showNotification = (message) => {
-		const id = uuid();
-		addAction(message, id);
-		setTimeout(() => removeAction(id), 3000);
-	};
-}
-
-export let showNotification;

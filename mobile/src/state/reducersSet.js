@@ -6,7 +6,6 @@ import player from './reducers/player';
 import lights from './reducers/lights';
 import appState from './reducers/appState';
 import location from './reducers/location';
-import notifications from './reducers/notifications';
 
 const reducersSet = combineReducers({
 	aircon,
@@ -15,7 +14,6 @@ const reducersSet = combineReducers({
 	lights,
 	appState,
 	location,
-	notifications,
 });
 
 export default reducersSet;

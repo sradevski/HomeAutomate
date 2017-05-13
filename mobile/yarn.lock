@@ -3348,10 +3348,6 @@ react-native-button@^1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/react-native-button/-/react-native-button-1.8.2.tgz#49e5cadd22ee443adea52a85539d288aa2117ade"
 
-react-native-statusbar-alert@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/react-native-statusbar-alert/-/react-native-statusbar-alert-0.0.2.tgz#2b514326e9264b207bc4cdd2eb2db751efce7137"
-
 react-native-vector-icons@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-4.0.0.tgz#6a2f8f4c6ace613aed7748cd530809283e5b1538"

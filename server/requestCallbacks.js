@@ -10,6 +10,20 @@ function showError(err) {
 	console.log(err.toString());
 }
 
+function sanitizeConfig(config){
+	resursiveRemoveProp(config, 'commands')
+}
+
+function resursiveRemoveProp(obj, propName) {
+  for(let key in obj){
+    if(key === propName){
+      delete obj[key];
+    }else if (typeof(obj[key]) === 'object'){
+      resursiveRemoveProp(obj[key], propName);
+    }
+  }
+}
+
 function getFullConfig(shouldUseCache, callback) {
 	const currentTimestamp = Date.now();
 	const isCacheBad = !configCache || (configCache.timestamp - currentTimestamp) > cacheTimeToLiveMs;
@@ -33,7 +47,11 @@ function getFullConfig(shouldUseCache, callback) {
 
 function sendConfigToClient(selector, callback, shouldUseCache = true) {
 	getFullConfig(shouldUseCache, (data) => {
-		callback(JSON.stringify(data[selector]));
+		sanitizeConfig(data);
+		if(selector)
+			callback(JSON.stringify(data[selector]));
+		else
+			callback(JSON.stringify(data));
 	});
 }
 
@@ -62,7 +80,7 @@ function executeLightsCommands(req, res) {
 			case 'getState':
 				sendConfigToClient(configSelector, (data) => res.send(data))
 				break;
-			case 'toggleAllLights':
+			case 'toggleLight':
 			case 'toggleYellowLights':
 			case 'toggleSingleLight':
 				pythonCaller.executePythonScript(scriptsFolder, 'lights_controller.py', func.args, sendConfigToClient.bind(this, configSelector, (data) => res.send(data), false));
@@ -104,9 +122,33 @@ function executeAlarmCommands(req, res) {
 	});
 }
 
+function executeLocationCommands(req, res) {
+	let functionList = req.body;
+	let configSelector = 'location';
+	functionList.forEach(func => {
+		switch (func.name) {
+			case 'getState':
+				sendConfigToClient(configSelector, (data) => res.send(data))
+				break;
+		}
+	});
+}
+
+function executeStateCommands(req, res) {
+	let functionList = req.body;
+	let configSelector = '';
+	functionList.forEach(func => {
+		switch (func.name) {
+			case 'getState':
+				sendConfigToClient(configSelector, (data) => res.send(data))
+				break;
+		}
+	});
+}
+
 function executeHotkeyCommands(req, res) {
 	let functionList = req.body;
-	let configSelector = 'steve';
+	let configSelector = '';
 	functionList.forEach(func => {
 		switch (func.name) {
 			case 'getState':
@@ -130,4 +172,6 @@ exports.executePlayerCommands = executePlayerCommands;
 exports.executeLightsCommands = executeLightsCommands;
 exports.executeAlarmCommands = executeAlarmCommands;
 exports.executeHotkeyCommands = executeHotkeyCommands;
+exports.executeStateCommands = executeStateCommands;
+exports.executeLocationCommands = executeLocationCommands;
 exports.sendConfigToClient = sendConfigToClient;

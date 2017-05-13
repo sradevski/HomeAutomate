@@ -112,6 +112,7 @@
     "console": true,
     "process": true,
     "setTimeout": true,
-    "requestAnimationFrame": true
+    "requestAnimationFrame": true,
+    "GLOBAL": true
   }
 }

@@ -1,33 +1,32 @@
 {
-    "name": "homeAutomate",
-    "version": "0.1.0",
-    "private": true,
-    "scripts": {
-        "start": "node node_modules/react-native/local-cli/cli.js start",
-        "test": "jest"
-    },
-    "dependencies": {
-        "base-64": "^0.1.0",
-        "lodash": "^4.17.4",
-        "react": "15.4.2",
-        "react-native": "0.42.3",
-        "react-native-button": "^1.8.2",
-        "react-native-statusbar-alert": "^0.0.2",
-        "react-native-vector-icons": "^4.0.0",
-        "react-redux": "^4.4.5",
-        "redux": "^3.6.0",
-        "uuid": "^3.0.1"
-    },
-    "devDependencies": {
-        "babel-jest": "19.0.0",
-        "babel-preset-react-native": "1.9.1",
-        "eslint": "^3.9.1",
-        "eslint-plugin-react": "^6.5.0",
-        "eslint-plugin-react-native": "^2.0.0",
-        "jest": "19.0.2",
-        "react-test-renderer": "15.4.2"
-    },
-    "jest": {
-        "preset": "react-native"
-    }
+  "name": "homeAutomate",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "base-64": "^0.1.0",
+    "lodash": "^4.17.4",
+    "react": "15.4.2",
+    "react-native": "0.42.3",
+    "react-native-button": "^1.8.2",
+    "react-native-vector-icons": "^4.0.0",
+    "react-redux": "^4.4.5",
+    "redux": "^3.6.0",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "babel-jest": "19.0.0",
+    "babel-preset-react-native": "1.9.1",
+    "eslint": "^3.9.1",
+    "eslint-plugin-react": "^6.5.0",
+    "eslint-plugin-react-native": "^2.0.0",
+    "jest": "19.0.2",
+    "react-test-renderer": "15.4.2"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
 }

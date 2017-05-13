@@ -6,8 +6,9 @@ import Button from 'react-native-button';
 import _ from 'lodash';
 
 import ClickableLabel from './sectionClickableLabel';
-import {makeServerCall, generateRequestBody, showNotification} from '../shared/utils';
+import {makeServerCall, generateRequestBody} from '../shared/utils';
 import {toggleLight, updateLightsState} from '../state/actions/lights';
+import {showNotification, changeConnectionStatus} from '../state/actions/appState';
 
 const mapStateToProps = (state) => ({
 	lights: state.lights,
@@ -19,18 +20,21 @@ const mapDispatchToProps = (dispatch) => ({
 	},
 	updateLightsState: (newState) => {
 		dispatch(updateLightsState(newState));
+	},
+	showNetworkStatus: (message) => {
+		dispatch(changeConnectionStatus(message));
+	},
+	showNotification: (message) => {
+		dispatch(showNotification(message));
 	}
 });
 
 class Lights extends Component {
-	componentDidMount(){
-		this.sendToServer(generateRequestBody('getState', []));
-	}
-
 	sendToServer(requestBody){
+		this.props.showNetworkStatus('Fetching...');
 		makeServerCall('lights', requestBody)
-		.then((data) => this.props.updateLightsState(data))
-		.catch((err) => showNotification('Oops, it didn\'t work.'));
+		.then((data) => { this.props.updateLightsState(data); 	this.props.showNetworkStatus('Fetched lights data.'); })
+		.catch((err) => { this.props.showNotification('Oops, it didn\'t work.'); 	this.props.showNetworkStatus('Fetching failed.'); });
 	}
 
 	toggleAllLights(shouldSetAllOn = false){
@@ -41,8 +45,8 @@ class Lights extends Component {
 			nextLightsState[key] = shouldTurnOn;
 		});
 
-		this.updateLightsState(nextLightsState);
-		this.sendToServer(generateRequestBody('toggleAllLights', shouldTurnOn ? ['an'] : ['af']));
+		this.props.updateLightsState(nextLightsState);
+		this.sendToServer(generateRequestBody('toggleLight', shouldTurnOn ? ['an'] : ['af']));
 	}
 
 	toggleSingleLight(lightToModify){
@@ -51,8 +55,7 @@ class Lights extends Component {
 		const lightToggle = lightNextState ? 'n' : 'f';
 
 		this.props.toggleLight(lightToModify);
-		//TODO: Rename toggleAllLights to toggleLight on server first, then here.
-		this.sendToServer(generateRequestBody('toggleAllLights', [lightId + lightToggle]));
+		this.sendToServer(generateRequestBody('toggleLight', [lightId + lightToggle]));
 	}
 
 	isAnyOn(){
