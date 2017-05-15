@@ -13,30 +13,27 @@ GPIO.setup(sensor, GPIO.IN, GPIO.PUD_DOWN)
 turn_on_hour = 18
 turn_off_hour = 8
 last_movement_time = time.localtime(time.time())
-last_light_active = False
 
 while True:
     time.sleep(3)
     current_state = GPIO.input(sensor)
+    current_time = time.localtime(time.time())
+    print(current_state)
     if current_state == 1:
         last_movement_time = time.localtime(time.time())
     	config = core.load_config()
-   	    if config['location']['am_home'] == False:
+    print(last_movement_time)
+   	if config['location']['am_home'] == False:
             come_home.turn_on_all([])
 
-        else:
-            current_time = time.localtime(time.time())
-            if current_time.tm_hour > turn_on_hour or localtime.tm_hour < turn_off_hour:
-                if time.mktime(current_time) - time.mktime(last_movement_time) > 900:
-                    config = core.load_config()
-                    if not config["lights"]["shelf_light"]["is_on"]:
-                        radio_lights.turn_on_single(config["lights"]["shelf_light"])
-                        core.write_config(config)
-                        last_light_active = current_time
+        elif current_time.tm_hour > turn_on_hour or localtime.tm_hour < turn_off_hour:
+            config = core.load_config()
+            if not config["lights"]["shelf_light"]["is_on"]:
+                radio_lights.turn_on_single(config["lights"]["shelf_light"])
+                core.write_config(config)
 
-    if last_light_active != False and time.mktime(current_time) - time.mktime(last_light_active) > 80:
+    if  time.mktime(current_time) - time.mktime(last_movement_time) > 80:
         config = core.load_config()
         if config["lights"]["shelf_light"]["is_on"]:
             radio_lights.turn_off_single(config["lights"]["shelf_light"])
             core.write_config(config)
-            last_light_active = False
